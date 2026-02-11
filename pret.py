@@ -42,7 +42,8 @@ print ("remboursement mensuel: ", remboursement_mensuel)
 # Interets annuels
 print (" ------------ Interets annuels ------------ ")
 years = []
-Interets = []
+Interets_annuels = []
+Reste_a_rembourser_annuels = []
 reste_a_rembourser = P
 Interets_annee_en_cours = 0
 Interets_year_1 = 0
@@ -53,8 +54,9 @@ while (reste_a_rembourser > 0):
     reste_a_rembourser = reste_a_rembourser - remboursement_mensuel + (reste_a_rembourser*Tm)
     if month%12==0:
         years.append(year)
+        Reste_a_rembourser_annuels.append(reste_a_rembourser)
         print ("Interets annee:", year, " : ", int(Interets_annee_en_cours))
-        Interets.append(Interets_annee_en_cours)
+        Interets_annuels.append(Interets_annee_en_cours)
         if year == 1:
             Interets_year_1 = int(Interets_annee_en_cours)
         Interets_annee_en_cours = 0
@@ -94,26 +96,29 @@ def find_what_deductible_to_what_bracket(w_d_t_w_b, tax_brackets, deduction):
                 deductible_of_this_bracket = tax_brackets[i+1][1]-tax_brackets[i][1]
                 total_deductible_for_all_brackets += deductible_of_this_bracket
                 w_d_t_w_b.append([i,deductible_of_this_bracket])
+                
+def calculate_corresponding_tax(w_d_t_w_b, t_b, tax):
+    total = 0
+    t=0
+    for i in range(len(w_d_t_w_b)):
+        tax_bracket_index = w_d_t_w_b[i][0]
+        print("    part of tax to this bracket: ", w_d_t_w_b[i][1], " percentage of this bracket: ", t_b[tax_bracket_index][0])
+        t+=w_d_t_w_b[i][1]
+        total += t_b[tax_bracket_index][0]*w_d_t_w_b[i][1]/100
+    #print("    Verification. t1 and t2 should must be the same. t1=",t, "t2=", tax)    
+    return(total)
 
 print(" --- Federal ---")
 print("In case of itemization, here is what can be deducted from federal tax income")
 what_deductible_to_what_bracket = []
 find_what_deductible_to_what_bracket(what_deductible_to_what_bracket, Federal_tax_brackets, Interets_year_1)
-print(what_deductible_to_what_bracket)
-federal_saving = 0
-for i in range(len(what_deductible_to_what_bracket)):
-    tax_bracket_index = what_deductible_to_what_bracket[i][0]
-    federal_saving += Federal_tax_brackets[tax_bracket_index][0]*what_deductible_to_what_bracket[i][1]/100
+federal_saving = calculate_corresponding_tax(what_deductible_to_what_bracket, Federal_tax_brackets, Interets_year_1)
 print("federal_saving: ", int(federal_saving))
 
 print("But if in case of itemization, the default discount from tax income no longer apply")
 what_deductible_to_what_bracket = []
 find_what_deductible_to_what_bracket(what_deductible_to_what_bracket, Federal_tax_brackets, Non_itemized_federal_standard_deduction)
-print(what_deductible_to_what_bracket)
-federal_loosing = 0
-for i in range(len(what_deductible_to_what_bracket)):
-    tax_bracket_index = what_deductible_to_what_bracket[i][0]
-    federal_loosing += Federal_tax_brackets[tax_bracket_index][0]*what_deductible_to_what_bracket[i][1]/100
+federal_loosing = calculate_corresponding_tax(what_deductible_to_what_bracket, Federal_tax_brackets, Non_itemized_federal_standard_deduction)
 print("federal_loosing: ", int(federal_loosing))
 
 
@@ -121,21 +126,13 @@ print(" --- State ---")
 print("In case of itemization, here is what can be deducted from state tax income")
 what_deductible_to_what_bracket = []
 find_what_deductible_to_what_bracket(what_deductible_to_what_bracket, State_tax_brackets, Interets_year_1)
-print(what_deductible_to_what_bracket)
-state_saving = 0
-for i in range(len(what_deductible_to_what_bracket)):
-    tax_bracket_index = what_deductible_to_what_bracket[i][0]
-    state_saving += State_tax_brackets[tax_bracket_index][0]*what_deductible_to_what_bracket[i][1]/100
+state_saving = calculate_corresponding_tax(what_deductible_to_what_bracket, State_tax_brackets, Interets_year_1)
 print("state_saving: ", int(state_saving))
 
 print("But if in case of itemization, the default discount from tax income no longer apply")
 what_deductible_to_what_bracket = []
 find_what_deductible_to_what_bracket(what_deductible_to_what_bracket, State_tax_brackets, Non_itemized_state_standard_deduction)
-print(what_deductible_to_what_bracket)
-state_loosing = 0
-for i in range(len(what_deductible_to_what_bracket)):
-    tax_bracket_index = what_deductible_to_what_bracket[i][0]
-    state_loosing += State_tax_brackets[tax_bracket_index][0]*what_deductible_to_what_bracket[i][1]/100
+state_loosing = calculate_corresponding_tax(what_deductible_to_what_bracket, State_tax_brackets, Non_itemized_state_standard_deduction)
 print("state_loosing: ", int(state_loosing))
 
 print(" --- TOTAL GAIN fist year ---")
@@ -158,15 +155,15 @@ print("Total_tax_discount_year_1_per_month: ", Total_tax_discount_year_1/12)
 print("Reboursement mensuel avec tax decution: ", remboursement_mensuel - Total_tax_discount_year_1/12)
 
 # Create plot
-#print (Interets)
-plt.plot(years, Interets, marker='o', color='blue', linestyle='--', label='Interets annuels')
+#print (Interets_annuels)
+plt.plot(years, Interets_annuels, marker='o', color='blue', linestyle='--', label='Interets annuels')
 
 # Add labels and title
 plt.xlabel('years')
 plt.ylabel('Interets annuels')
 plt.title('Interets annuels')
 plt.legend()
-
+    
 # Show plot
 plt.show()
 
