@@ -142,18 +142,6 @@ print("deduction mensuelle: ", int(total_gain/12))
 print("remboursement mensuel avec deduction: ", remboursement_mensuel - int(total_gain/12))
 
 
-print(" --- verify ---")
-Federal_tax_discount_year_1 = (Taxable_income - 751600)*0.37 + (Interets_year_1 - (Taxable_income - 751600))*0.35
-State_tax_discount_year_1 = Interets_year_1*0.103
-Total_tax_discount_year_1 =  Federal_tax_discount_year_1 + State_tax_discount_year_1
-
-print("Federal_tax_discount_year_1: ", Federal_tax_discount_year_1)
-print("State_tax_discount_year_1: ", State_tax_discount_year_1)
-print("Total_tax_discount_year_1: ", Total_tax_discount_year_1)
-
-print("Total_tax_discount_year_1_per_month: ", Total_tax_discount_year_1/12)
-print("Reboursement mensuel avec tax decution: ", remboursement_mensuel - Total_tax_discount_year_1/12)
-
 # Create plot
 #print (Interets_annuels)
 plt.plot(years, Interets_annuels, marker='o', color='blue', linestyle='--', label='Interets annuels')
